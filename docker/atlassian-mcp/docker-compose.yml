@@ -1,0 +1,56 @@
+---
+# Atlassian MCP Server
+#
+# Usage:
+#   1. cp docker/atlassian-mcp/.env.example docker/atlassian-mcp/.env
+#   2. Edit .env with your Jira/Confluence credentials
+#   3. make mcp-up          # start in background
+#      make mcp-logs        # tail logs
+#      make mcp-down        # stop and remove
+#
+# The server exposes the MCP streamable-HTTP endpoint at:
+#   http://localhost:${MCP_PORT:-9000}/mcp
+#
+# Set atlassian.mcp_url in your slack-tickets.yaml to match:
+#   atlassian:
+#     mcp_url: "http://localhost:9000"
+
+services:
+  atlassian-mcp:
+    image: ghcr.io/sooperset/mcp-atlassian:latest
+    container_name: atlassian-mcp
+    restart: unless-stopped
+
+    # Expose the MCP HTTP port on localhost only (not to the network).
+    ports:
+      - "127.0.0.1:${MCP_PORT:-9000}:${MCP_PORT:-9000}"
+
+    # Pass credentials from .env into the container.
+    environment:
+      # Jira
+      - JIRA_URL=${JIRA_URL}
+      - JIRA_USERNAME=${JIRA_USERNAME:-}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN:-}
+      - JIRA_PERSONAL_TOKEN=${JIRA_PERSONAL_TOKEN:-}
+      # Confluence (optional)
+      - CONFLUENCE_URL=${CONFLUENCE_URL:-}
+      - CONFLUENCE_USERNAME=${CONFLUENCE_USERNAME:-}
+      - CONFLUENCE_API_TOKEN=${CONFLUENCE_API_TOKEN:-}
+
+    # Start the server in streamable-HTTP mode so it can be reached over HTTP
+    # from the slack-tickets tool running on the host.
+    command:
+      - "--transport"
+      - "streamable-http"
+      - "--port"
+      - "${MCP_PORT:-9000}"
+      - "${MCP_LOG_LEVEL:--v}"
+
+    healthcheck:
+      # Open a TCP connection to confirm the server is listening.
+      # Works in the alpine-based container image without extra tools.
+      test: ["CMD-SHELL", "echo >/dev/tcp/localhost/${MCP_PORT:-9000}"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
