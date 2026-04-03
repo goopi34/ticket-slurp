@@ -9,14 +9,13 @@ linters:
     - revive
     - ineffassign
     - unused
-
-linters-settings:
-  revive:
-    rules:
-      - name: exported
-      - name: error-return
-      - name: error-strings
-      - name: var-naming
+  settings:
+    revive:
+      rules:
+        - name: exported
+        - name: error-return
+        - name: error-strings
+        - name: var-naming
 
 issues:
   max-issues-per-linter: 0
