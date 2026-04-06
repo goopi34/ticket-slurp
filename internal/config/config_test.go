@@ -42,7 +42,8 @@ llm:
     deployment: "gpt-4o"
 atlassian:
   mcp_url: "http://localhost:3000"
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 output:
   format: "markdown"
 `
@@ -79,7 +80,8 @@ llm:
     api_key: "k"
     deployment: "d"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 `)
 	cfg, err := config.Load(path)
 	if err != nil {
@@ -103,7 +105,8 @@ llm:
     api_key: "k"
     deployment: "d"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 `)
 	cfg, err := config.Load(path)
 	if err != nil {
@@ -124,7 +127,8 @@ timeframe:
 llm:
   provider: "badprovider"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 `)
 	cfg, err := config.Load(path)
 	if err != nil {
@@ -151,7 +155,8 @@ llm:
     api_key: "k"
     deployment: "d"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 `)
 	cfg, err := config.Load(path)
 	if err != nil {
@@ -177,7 +182,8 @@ llm:
     api_key: "k"
     deployment: "d"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 `)
 	cfg, err := config.Load(path)
 	if err != nil {
@@ -202,7 +208,8 @@ llm:
     api_key: "k"
     deployment: "d"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 output:
   format: "xml"
 `)
@@ -215,7 +222,7 @@ output:
 	}
 }
 
-func TestValidate_MissingProjectKey(t *testing.T) {
+func TestValidate_MissingProjectKeys(t *testing.T) {
 	path := writeConfig(t, `
 slack:
   xoxc: "x"
@@ -234,7 +241,7 @@ atlassian:
 		t.Fatalf("Load(): %v", err)
 	}
 	if err := cfg.Validate(); err == nil {
-		t.Fatal("expected validation error for missing project_key")
+		t.Fatal("expected validation error for missing project_keys")
 	}
 }
 
@@ -253,7 +260,8 @@ llm:
     api_key: "${TEST_AZURE_KEY}"
     deployment: "d"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 `)
 	cfg, err := config.Load(path)
 	if err != nil {
@@ -278,7 +286,8 @@ llm:
     api_key: "k"
     deployment: "d"
 atlassian:
-  project_key: "ENG"
+  project_keys:
+    - "ENG"
 `)
 	cfg, err := config.Load(path)
 	if err != nil {

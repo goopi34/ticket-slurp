@@ -70,7 +70,7 @@ func buildConfig() *config.Config {
 			End:   "2026-04-01",
 		},
 		LLM:       config.LLMConfig{Provider: "azure"},
-		Atlassian: config.AtlassianConfig{ProjectKey: "ENG"},
+		Atlassian: config.AtlassianConfig{ProjectKeys: []string{"ENG"}},
 		Output:    config.OutputConfig{Format: "markdown"},
 	}
 }

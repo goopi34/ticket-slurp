@@ -53,7 +53,7 @@ func TestIdentifyTickets_ValidResponse(t *testing.T) {
 	payload, _ := json.Marshal(candidates)
 
 	gen := &mockGenerator{response: string(payload)}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	conv := makeConv("C001", "eng-bugs")
 	msgs := []slack.Message{makeMsg("1711929600.000000", "We keep getting logged out after 5 minutes!")}
@@ -83,7 +83,7 @@ func TestIdentifyTickets_ValidResponse(t *testing.T) {
 
 func TestIdentifyTickets_EmptyMessages(t *testing.T) {
 	gen := &mockGenerator{}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	result, err := analyzer.IdentifyTickets(context.Background(), makeConv("C001", "test"), nil)
 	if err != nil {
@@ -99,7 +99,7 @@ func TestIdentifyTickets_EmptyMessages(t *testing.T) {
 
 func TestIdentifyTickets_EmptyArray(t *testing.T) {
 	gen := &mockGenerator{response: "[]"}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	result, err := analyzer.IdentifyTickets(context.Background(), makeConv("C001", "test"),
 		[]slack.Message{makeMsg("1711929600.000000", "all good")})
@@ -113,7 +113,7 @@ func TestIdentifyTickets_EmptyArray(t *testing.T) {
 
 func TestIdentifyTickets_LLMError(t *testing.T) {
 	gen := &mockGenerator{err: context.DeadlineExceeded}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	_, err := analyzer.IdentifyTickets(context.Background(), makeConv("C001", "test"),
 		[]slack.Message{makeMsg("1711929600.000000", "error test")})
@@ -124,7 +124,7 @@ func TestIdentifyTickets_LLMError(t *testing.T) {
 
 func TestIdentifyTickets_InvalidJSON(t *testing.T) {
 	gen := &mockGenerator{response: "not json at all"}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	_, err := analyzer.IdentifyTickets(context.Background(), makeConv("C001", "test"),
 		[]slack.Message{makeMsg("1711929600.000000", "msg")})
@@ -136,7 +136,7 @@ func TestIdentifyTickets_InvalidJSON(t *testing.T) {
 func TestIdentifyTickets_CodeFenceStripped(t *testing.T) {
 	raw := "```json\n[]\n```"
 	gen := &mockGenerator{response: raw}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	result, err := analyzer.IdentifyTickets(context.Background(), makeConv("C001", "test"),
 		[]slack.Message{makeMsg("1711929600.000000", "msg")})
@@ -167,7 +167,7 @@ func TestIdentifyTickets_PriorityNormalisation(t *testing.T) {
 		}
 		payload, _ := json.Marshal(candidates)
 		gen := &mockGenerator{response: string(payload)}
-		analyzer := analysis.NewGollmAnalyzer(gen)
+		analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 		result, err := analyzer.IdentifyTickets(context.Background(), makeConv("C001", "ch"),
 			[]slack.Message{makeMsg("1711929600.000000", "msg")})
@@ -189,7 +189,7 @@ func TestBuildPrompt_ContainsChannelAndMessages(t *testing.T) {
 	gen.response = "[]"
 
 	// We exercise the prompt via IdentifyTickets; inspect what was recorded.
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 	conv := makeConv("C001", "eng-general")
 	msgs := []slack.Message{makeMsg("1711929600.000000", "hello world")}
 
@@ -215,7 +215,7 @@ func TestBuildPrompt_ContainsChannelAndMessages(t *testing.T) {
 
 func TestBuildPrompt_LongMessageTruncated(t *testing.T) {
 	gen := &mockGenerator{response: "[]"}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	// Create a message that exceeds the 2000-char truncation threshold.
 	longText := strings.Repeat("a", 2500)
@@ -241,7 +241,7 @@ func TestIdentifyTickets_SkipsMalformedEntries(t *testing.T) {
 	// Entries with no title should be silently dropped.
 	payload := `[{"title":"","priority":"high"},{"title":"Valid title","priority":"low"}]`
 	gen := &mockGenerator{response: payload}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, "")
 
 	result, err := analyzer.IdentifyTickets(context.Background(), makeConv("C001", "ch"),
 		[]slack.Message{makeMsg("ts1", "msg")})

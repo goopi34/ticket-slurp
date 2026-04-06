@@ -98,10 +98,10 @@ func runPipeline(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return fmt.Errorf("create LLM generator: %w", err)
 	}
-	analyzer := analysis.NewGollmAnalyzer(gen)
+	analyzer := analysis.NewGollmAnalyzer(gen, cfg.LLM.SystemPrompt)
 
 	// Build Atlassian MCP client.
-	atlassianClient := atlassian.NewMCPClient(cfg.Atlassian.MCPURL, cfg.Atlassian.ProjectKey, nil)
+	atlassianClient := atlassian.NewMCPClient(cfg.Atlassian.MCPURL, cfg.Atlassian.ProjectKeys, nil)
 
 	// Wire the pipeline.
 	runner := pipeline.New(cfg, slackClient, analyzer, atlassianClient, reporter, logger)

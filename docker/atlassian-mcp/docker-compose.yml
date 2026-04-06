@@ -44,6 +44,7 @@ services:
       - "streamable-http"
       - "--port"
       - "${MCP_PORT:-9000}"
+      - "--read-only"
       - "${MCP_LOG_LEVEL:--v}"
 
     healthcheck:

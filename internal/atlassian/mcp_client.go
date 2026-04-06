@@ -18,21 +18,21 @@ import (
 // MCPClient implements Client by speaking the Model Context Protocol over HTTP/SSE
 // to an Atlassian MCP server (e.g. mcp-atlassian running in Docker).
 type MCPClient struct {
-	baseURL    string
-	projectKey string
-	http       *http.Client
-	idCounter  atomic.Int64
+	baseURL     string
+	projectKeys []string
+	http        *http.Client
+	idCounter   atomic.Int64
 }
 
 // NewMCPClient creates a new MCPClient.
-func NewMCPClient(mcpURL, projectKey string, httpClient *http.Client) *MCPClient {
+func NewMCPClient(mcpURL string, projectKeys []string, httpClient *http.Client) *MCPClient {
 	if httpClient == nil {
 		httpClient = &http.Client{Timeout: 60 * time.Second}
 	}
 	return &MCPClient{
-		baseURL:    strings.TrimRight(mcpURL, "/"),
-		projectKey: projectKey,
-		http:       httpClient,
+		baseURL:     strings.TrimRight(mcpURL, "/"),
+		projectKeys: projectKeys,
+		http:        httpClient,
 	}
 }
 
@@ -57,9 +57,9 @@ func (c *MCPClient) FindExisting(ctx context.Context, candidates []analysis.Tick
 
 // searchForCandidate looks for an existing Jira issue matching the candidate title.
 func (c *MCPClient) searchForCandidate(ctx context.Context, candidate analysis.TicketCandidate) (key string, found bool, err error) {
-	// Build a JQL query that searches by summary text within the configured project.
-	jql := fmt.Sprintf(`project = "%s" AND summary ~ "%s" ORDER BY created DESC`,
-		c.projectKey, escapeJQL(candidate.Title))
+	// Build a JQL query that searches by summary text within the configured projects.
+	jql := fmt.Sprintf(`project IN (%s) AND summary ~ "%s" ORDER BY created DESC`,
+		buildProjectList(c.projectKeys), escapeJQL(candidate.Title))
 
 	resp, err := c.callTool(ctx, "jira_search", map[string]interface{}{
 		"jql":         jql,
@@ -282,6 +282,16 @@ func isJiraKey(s string) bool {
 		}
 	}
 	return true
+}
+
+// buildProjectList formats a slice of project keys as a quoted, comma-separated
+// JQL IN list, e.g. `"ENG","OPS"`.
+func buildProjectList(keys []string) string {
+	quoted := make([]string, len(keys))
+	for i, k := range keys {
+		quoted[i] = `"` + k + `"`
+	}
+	return strings.Join(quoted, ",")
 }
 
 // escapeJQL escapes a string for use in a JQL ~ (text search) clause.
