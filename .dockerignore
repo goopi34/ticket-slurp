@@ -1,0 +1,27 @@
+# Git
+.git/
+.gitignore
+
+# Binaries
+bin/
+slack-tickets
+*.exe
+*.test
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (may contain secrets)
+config.yaml
+docker/**/.env
+
+# Test and coverage
+*.out
+*_test.go
