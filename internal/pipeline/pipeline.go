@@ -55,13 +55,23 @@ func (r *Runner) Run(ctx context.Context, w io.Writer) error {
 	}
 	r.logger.Info("time range resolved", "from", from.Format("2006-01-02"), "to", to.Format("2006-01-02"))
 
-	// 2. List conversations.
-	r.logger.Info("listing Slack conversations")
-	conversations, err := r.slack.ListConversations(ctx)
-	if err != nil {
-		return fmt.Errorf("list conversations: %w", err)
+	// 2. List conversations — or build the list directly from the whitelist when
+	// one is configured, avoiding the conversations.list API call (which may be
+	// restricted on Enterprise Grid workspaces).
+	var conversations []slack.Conversation
+	if len(r.cfg.Channels.Whitelist) > 0 {
+		r.logger.Info("using whitelisted channels; skipping conversations.list", "count", len(r.cfg.Channels.Whitelist))
+		for _, id := range r.cfg.Channels.Whitelist {
+			conversations = append(conversations, slack.Conversation{ID: id, Name: id})
+		}
+	} else {
+		r.logger.Info("listing Slack conversations")
+		conversations, err = r.slack.ListConversations(ctx)
+		if err != nil {
+			return fmt.Errorf("list conversations: %w", err)
+		}
+		r.logger.Info("conversations found", "count", len(conversations))
 	}
-	r.logger.Info("conversations found", "count", len(conversations))
 
 	// 3. Fetch messages and analyze each conversation.
 	var allCandidates []analysis.TicketCandidate
