@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"slack-tickets/internal/analysis"
+	"ticket-slurp/internal/analysis"
 )
 
 // Reporter writes a ticket candidate report to an io.Writer.
@@ -125,10 +125,10 @@ type JSONReporter struct{}
 
 // jsonReport is the top-level JSON output structure.
 type jsonReport struct {
-	GeneratedAt string                      `json:"generated_at"`
-	Total       int                         `json:"total_identified"`
-	NeedTickets int                         `json:"need_tickets"`
-	Candidates  []analysis.TicketCandidate  `json:"candidates"`
+	GeneratedAt string                     `json:"generated_at"`
+	Total       int                        `json:"total_identified"`
+	NeedTickets int                        `json:"need_tickets"`
+	Candidates  []analysis.TicketCandidate `json:"candidates"`
 }
 
 // Write implements Reporter.

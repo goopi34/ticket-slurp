@@ -3,7 +3,7 @@ package analysis
 import (
 	"testing"
 
-	"slack-tickets/internal/config"
+	"ticket-slurp/internal/config"
 )
 
 func TestBuildGollmOptions_UnsupportedProvider(t *testing.T) {

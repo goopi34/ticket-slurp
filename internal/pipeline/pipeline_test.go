@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"slack-tickets/internal/analysis"
-	"slack-tickets/internal/atlassian"
-	"slack-tickets/internal/config"
-	"slack-tickets/internal/pipeline"
-	"slack-tickets/internal/report"
-	"slack-tickets/internal/slack"
+	"ticket-slurp/internal/analysis"
+	"ticket-slurp/internal/atlassian"
+	"ticket-slurp/internal/config"
+	"ticket-slurp/internal/pipeline"
+	"ticket-slurp/internal/report"
+	"ticket-slurp/internal/slack"
 )
 
 // --- test doubles ---

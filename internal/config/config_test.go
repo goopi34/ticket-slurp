@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"slack-tickets/internal/config"
+	"ticket-slurp/internal/config"
 )
 
 // writeConfig writes content to a temp file and returns its path.

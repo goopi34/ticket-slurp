@@ -38,8 +38,8 @@ type SlackConfig struct {
 // TimeframeConfig specifies the message date range.
 // Either (Start + End) or LastDays must be set.
 type TimeframeConfig struct {
-	Start    string `mapstructure:"start"`    // ISO 8601 date, e.g. "2026-03-01"
-	End      string `mapstructure:"end"`      // ISO 8601 date, e.g. "2026-04-03"
+	Start    string `mapstructure:"start"`     // ISO 8601 date, e.g. "2026-03-01"
+	End      string `mapstructure:"end"`       // ISO 8601 date, e.g. "2026-04-03"
 	LastDays int    `mapstructure:"last_days"` // alternative to explicit dates
 }
 
@@ -100,7 +100,7 @@ func Load(path string) (*Config, error) {
 	if path != "" {
 		v.SetConfigFile(path)
 	} else {
-		v.SetConfigName("slack-tickets")
+		v.SetConfigName("ticket-slurp")
 		v.SetConfigType("yaml")
 		v.AddConfigPath(".")
 	}

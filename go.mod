@@ -1,4 +1,4 @@
-module slack-tickets
+module ticket-slurp
 
 go 1.26.1
 

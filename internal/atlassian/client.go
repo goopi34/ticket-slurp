@@ -4,7 +4,7 @@ package atlassian
 import (
 	"context"
 
-	"slack-tickets/internal/analysis"
+	"ticket-slurp/internal/analysis"
 )
 
 // Client searches Jira for tickets that may already cover identified work.

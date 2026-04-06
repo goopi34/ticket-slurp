@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"slack-tickets/internal/analysis"
-	"slack-tickets/internal/atlassian"
+	"ticket-slurp/internal/analysis"
+	"ticket-slurp/internal/atlassian"
 )
 
 func makeCandidate(id, title string) analysis.TicketCandidate {
@@ -256,10 +256,10 @@ func TestIsJiraKey(t *testing.T) {
 		{"ENG-123", "ENG-123", true},
 		{"PROJ-1", "PROJ-1", true},
 		{"not-a-key", "", false},
-		{"eng-123", "", false},   // lowercase prefix
-		{"ENG-12X", "", false},   // non-numeric suffix
-		{"ENG-", "", false},      // empty suffix
-		{"-123", "", false},      // empty prefix
+		{"eng-123", "", false}, // lowercase prefix
+		{"ENG-12X", "", false}, // non-numeric suffix
+		{"ENG-", "", false},    // empty suffix
+		{"-123", "", false},    // empty prefix
 		{"", "", false},
 	}
 
