@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"slack-tickets/internal/analysis"
+	"ticket-slurp/internal/analysis"
 )
 
 // MCPClient implements Client by speaking the Model Context Protocol over HTTP/SSE
@@ -62,7 +62,7 @@ func (c *MCPClient) searchForCandidate(ctx context.Context, candidate analysis.T
 		c.projectKey, escapeJQL(candidate.Title))
 
 	resp, err := c.callTool(ctx, "jira_search", map[string]interface{}{
-		"jql":        jql,
+		"jql":         jql,
 		"max_results": 1,
 	})
 	if err != nil {

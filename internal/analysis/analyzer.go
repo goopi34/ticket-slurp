@@ -3,7 +3,7 @@ package analysis
 import (
 	"context"
 
-	"slack-tickets/internal/slack"
+	"ticket-slurp/internal/slack"
 )
 
 // Analyzer identifies potential tickets from Slack conversation messages.

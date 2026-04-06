@@ -1,4 +1,4 @@
-// Package main is the entrypoint for the slack-tickets CLI.
+// Package main is the entrypoint for the ticket-slurp CLI.
 package main
 
 import (
@@ -12,12 +12,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"slack-tickets/internal/analysis"
-	"slack-tickets/internal/atlassian"
-	"slack-tickets/internal/config"
-	"slack-tickets/internal/pipeline"
-	"slack-tickets/internal/report"
-	"slack-tickets/internal/slack"
+	"ticket-slurp/internal/analysis"
+	"ticket-slurp/internal/atlassian"
+	"ticket-slurp/internal/config"
+	"ticket-slurp/internal/pipeline"
+	"ticket-slurp/internal/report"
+	"ticket-slurp/internal/slack"
 )
 
 // Build-time variables injected by goreleaser via -ldflags.
@@ -38,16 +38,16 @@ func main() {
 
 func newRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:   "slack-tickets",
+		Use:   "ticket-slurp",
 		Short: "Identify untracked engineering work from Slack conversations",
-		Long: `slack-tickets harvests messages from Slack conversations you participated in,
+		Long: `ticket-slurp harvests messages from Slack conversations you participated in,
 runs AI analysis to surface potential engineering tickets, cross-references
 against Jira to exclude already-tracked work, and reports the delta.`,
 		Version:      fmt.Sprintf("%s (commit %s, built %s)", version, commit, date),
 		SilenceUsage: true,
 	}
 
-	root.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ./slack-tickets.yaml)")
+	root.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default: ./ticket-slurp.yaml)")
 
 	cobra.OnInitialize(func() {
 		initConfig(cfgFile)
@@ -125,7 +125,7 @@ func initConfig(cfgFile string) {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
-		viper.SetConfigName("slack-tickets")
+		viper.SetConfigName("ticket-slurp")
 		viper.SetConfigType("yaml")
 		viper.AddConfigPath(".")
 	}

@@ -11,7 +11,7 @@
 # The server exposes the MCP streamable-HTTP endpoint at:
 #   http://localhost:${MCP_PORT:-9000}/mcp
 #
-# Set atlassian.mcp_url in your slack-tickets.yaml to match:
+# Set atlassian.mcp_url in your ticket-slurp.yaml to match:
 #   atlassian:
 #     mcp_url: "http://localhost:9000"
 
@@ -38,7 +38,7 @@ services:
       - CONFLUENCE_API_TOKEN=${CONFLUENCE_API_TOKEN:-}
 
     # Start the server in streamable-HTTP mode so it can be reached over HTTP
-    # from the slack-tickets tool running on the host.
+    # from the ticket-slurp tool running on the host.
     command:
       - "--transport"
       - "streamable-http"

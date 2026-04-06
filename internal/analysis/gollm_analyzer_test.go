@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"slack-tickets/internal/analysis"
-	"slack-tickets/internal/slack"
+	"ticket-slurp/internal/analysis"
+	"ticket-slurp/internal/slack"
 )
 
 // mockGenerator is a test double for LLMGenerator.

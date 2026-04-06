@@ -6,9 +6,9 @@
 *.dylib
 bin/
 dist/
-slack-tickets
+ticket-slurp
 
-# Test binary
+# Tests
 *.test
 
 # Output of go coverage

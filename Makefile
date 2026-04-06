@@ -2,7 +2,7 @@
         snapshot release-check \
         mcp-up mcp-down mcp-logs mcp-ps
 
-BIN     := bin/slack-tickets
+BIN     := bin/ticket-slurp
 PKG     := ./...
 GOFLAGS := -race
 
@@ -13,7 +13,7 @@ GORELEASER_VERSION    := v2.9.0
 # ── Build ──────────────────────────────────────────────────────────────────────
 
 build:
-	go build -o $(BIN) ./cmd/slack-tickets/
+	go build -o $(BIN) ./cmd/ticket-slurp/
 
 # ── Quality gates ──────────────────────────────────────────────────────────────
 

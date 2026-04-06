@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"slack-tickets/internal/slack"
+	"ticket-slurp/internal/slack"
 )
 
 // handler is a simple function-based http.Handler.
@@ -60,14 +60,14 @@ func TestListConversations_Pagination(t *testing.T) {
 		cursor := r.URL.Query().Get("cursor")
 		if cursor == "" {
 			writeJSON(t, w, map[string]interface{}{
-				"ok":       true,
-				"channels": []map[string]interface{}{{"id": "C001", "name": "a", "is_channel": true}},
+				"ok":                true,
+				"channels":          []map[string]interface{}{{"id": "C001", "name": "a", "is_channel": true}},
 				"response_metadata": map[string]string{"next_cursor": "page2"},
 			})
 		} else {
 			writeJSON(t, w, map[string]interface{}{
-				"ok":       true,
-				"channels": []map[string]interface{}{{"id": "C002", "name": "b", "is_channel": true}},
+				"ok":                true,
+				"channels":          []map[string]interface{}{{"id": "C002", "name": "b", "is_channel": true}},
 				"response_metadata": map[string]string{"next_cursor": ""},
 			})
 		}

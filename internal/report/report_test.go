@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"slack-tickets/internal/analysis"
-	"slack-tickets/internal/report"
+	"ticket-slurp/internal/analysis"
+	"ticket-slurp/internal/report"
 )
 
 func makeCandidate(id, title string, priority analysis.Priority, existingKey string) analysis.TicketCandidate {

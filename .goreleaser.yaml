@@ -1,6 +1,6 @@
 version: 2
 
-project_name: slack-tickets
+project_name: ticket-slurp
 
 before:
   hooks:
@@ -8,9 +8,9 @@ before:
     - go vet ./...
 
 builds:
-  - id: slack-tickets
-    main: ./cmd/slack-tickets/
-    binary: slack-tickets
+  - id: ticket-slurp
+    main: ./cmd/ticket-slurp/
+    binary: ticket-slurp
 
     # Inject version info at build time via ldflags.
     ldflags:
@@ -39,7 +39,7 @@ builds:
 archives:
   - id: default
     ids:
-      - slack-tickets
+      - ticket-slurp
 
     # tar.gz for Unix platforms, zip for Windows.
     formats:

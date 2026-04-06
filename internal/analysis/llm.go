@@ -7,7 +7,7 @@ import (
 
 	"github.com/teilomillet/gollm"
 
-	"slack-tickets/internal/config"
+	"ticket-slurp/internal/config"
 )
 
 // LLMGenerator is the interface for generating text from a prompt.

@@ -1,4 +1,4 @@
-// Package pipeline orchestrates the full slack-tickets workflow.
+// Package pipeline orchestrates the full ticket-slurp workflow.
 package pipeline
 
 import (
@@ -7,21 +7,21 @@ import (
 	"io"
 	"log/slog"
 
-	"slack-tickets/internal/analysis"
-	"slack-tickets/internal/atlassian"
-	"slack-tickets/internal/config"
-	"slack-tickets/internal/report"
-	"slack-tickets/internal/slack"
+	"ticket-slurp/internal/analysis"
+	"ticket-slurp/internal/atlassian"
+	"ticket-slurp/internal/config"
+	"ticket-slurp/internal/report"
+	"ticket-slurp/internal/slack"
 )
 
 // Runner executes the full pipeline.
 type Runner struct {
-	cfg      *config.Config
-	slack    slack.Client
-	analyzer analysis.Analyzer
+	cfg       *config.Config
+	slack     slack.Client
+	analyzer  analysis.Analyzer
 	atlassian atlassian.Client
-	reporter report.Reporter
-	logger   *slog.Logger
+	reporter  report.Reporter
+	logger    *slog.Logger
 }
 
 // New creates a Runner with all dependencies injected.
@@ -37,12 +37,12 @@ func New(
 		logger = slog.Default()
 	}
 	return &Runner{
-		cfg:      cfg,
-		slack:    slackClient,
-		analyzer: analyzer,
+		cfg:       cfg,
+		slack:     slackClient,
+		analyzer:  analyzer,
 		atlassian: atlassianClient,
-		reporter: reporter,
-		logger:   logger,
+		reporter:  reporter,
+		logger:    logger,
 	}
 }
 

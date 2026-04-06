@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"slack-tickets/internal/slack"
+	"ticket-slurp/internal/slack"
 )
 
 const systemPrompt = `You are an engineering team assistant that reviews Slack conversation history
