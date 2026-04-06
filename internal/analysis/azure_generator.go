@@ -61,7 +61,7 @@ func (g *AzureGenerator) Generate(ctx context.Context, prompt, systemPrompt stri
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("Azure OpenAI HTTP %s: %s", resp.Status, respBody)
+		return "", fmt.Errorf("azure OpenAI HTTP %s: %s", resp.Status, respBody)
 	}
 
 	var result struct {
@@ -78,10 +78,10 @@ func (g *AzureGenerator) Generate(ctx context.Context, prompt, systemPrompt stri
 		return "", fmt.Errorf("decode response: %w", err)
 	}
 	if result.Error != nil {
-		return "", fmt.Errorf("Azure OpenAI error: %s", result.Error.Message)
+		return "", fmt.Errorf("azure OpenAI error: %s", result.Error.Message)
 	}
 	if len(result.Choices) == 0 {
-		return "", fmt.Errorf("Azure OpenAI returned no choices")
+		return "", fmt.Errorf("azure OpenAI returned no choices")
 	}
 
 	return result.Choices[0].Message.Content, nil
