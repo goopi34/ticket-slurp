@@ -78,7 +78,7 @@ func TestFindExisting_NoMatch_JSON(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+	client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 	candidates := []analysis.TicketCandidate{makeCandidate("C001_ts1", "Fix login bug")}
 
 	found, err := client.FindExisting(context.Background(), candidates)
@@ -102,7 +102,7 @@ func TestFindExisting_MatchFound_JSON(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+	client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 	candidates := []analysis.TicketCandidate{makeCandidate("C001_ts1", "Fix login bug")}
 
 	found, err := client.FindExisting(context.Background(), candidates)
@@ -126,7 +126,7 @@ func TestFindExisting_MatchFound_SSE(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+	client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 	candidates := []analysis.TicketCandidate{makeCandidate("C001_ts1", "Fix login bug")}
 
 	found, err := client.FindExisting(context.Background(), candidates)
@@ -150,7 +150,7 @@ func TestFindExisting_MCPError_Skips(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+	client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 	candidates := []analysis.TicketCandidate{makeCandidate("C001_ts1", "Fix login bug")}
 
 	// MCP error should not propagate as a Go error; candidate is simply skipped.
@@ -182,7 +182,7 @@ func TestFindExisting_MultipleCandidates(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+	client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 	candidates := []analysis.TicketCandidate{
 		makeCandidate("C001_ts1", "First issue"),
 		makeCandidate("C001_ts2", "Second issue"),
@@ -216,7 +216,7 @@ func TestFindExisting_TextFallback(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+	client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 	candidates := []analysis.TicketCandidate{makeCandidate("C001_ts1", "Fix login bug")}
 
 	found, err := client.FindExisting(context.Background(), candidates)
@@ -234,7 +234,7 @@ func TestFindExisting_HTTPError_Skips(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+	client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 	candidates := []analysis.TicketCandidate{makeCandidate("C001_ts1", "Fix login bug")}
 
 	found, err := client.FindExisting(context.Background(), candidates)
@@ -274,7 +274,7 @@ func TestIsJiraKey(t *testing.T) {
 			writeJSON(t, w, mcpToolCallResponse(id, tt.text))
 		}))
 
-		client := atlassian.NewMCPClient(srv.URL, "ENG", nil)
+		client := atlassian.NewMCPClient(srv.URL, []string{"ENG"}, nil)
 		candidates := []analysis.TicketCandidate{makeCandidate("cid", "Some title")}
 		found, _ := client.FindExisting(context.Background(), candidates)
 

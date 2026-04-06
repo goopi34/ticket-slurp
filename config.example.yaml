@@ -27,6 +27,10 @@ llm:
   provider: "azure"
   # Model name (for openai/anthropic/ollama; for azure use deployment below)
   model: "gpt-4o"
+  # Optional: override the built-in analysis system prompt.
+  # When set, this text replaces the default prompt entirely.
+  # system_prompt: |
+  #   You are a ...your custom instructions...
 
   # Azure AI Foundry settings
   azure:
@@ -49,8 +53,10 @@ llm:
 atlassian:
   # URL of the mcp-atlassian server (e.g. running via Docker)
   mcp_url: "http://localhost:3000"
-  # Jira project key to search within
-  project_key: "ENG"
+  # One or more Jira project keys to search within.
+  project_keys:
+    - "ENG"
+    # - "OPS"
 
 output:
   # Report format: markdown (default) | json

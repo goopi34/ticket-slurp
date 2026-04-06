@@ -41,12 +41,18 @@ Rules:
 
 // GollmAnalyzer implements Analyzer using an LLMGenerator.
 type GollmAnalyzer struct {
-	gen LLMGenerator
+	gen          LLMGenerator
+	systemPrompt string
 }
 
 // NewGollmAnalyzer creates a new GollmAnalyzer with the provided LLMGenerator.
-func NewGollmAnalyzer(gen LLMGenerator) *GollmAnalyzer {
-	return &GollmAnalyzer{gen: gen}
+// If customPrompt is non-empty it replaces the built-in system prompt.
+func NewGollmAnalyzer(gen LLMGenerator, customPrompt string) *GollmAnalyzer {
+	prompt := systemPrompt
+	if customPrompt != "" {
+		prompt = customPrompt
+	}
+	return &GollmAnalyzer{gen: gen, systemPrompt: prompt}
 }
 
 // IdentifyTickets implements Analyzer.
@@ -57,7 +63,7 @@ func (a *GollmAnalyzer) IdentifyTickets(ctx context.Context, conv slack.Conversa
 
 	prompt := buildPrompt(conv, msgs)
 
-	raw, err := a.gen.Generate(ctx, prompt, systemPrompt)
+	raw, err := a.gen.Generate(ctx, prompt, a.systemPrompt)
 	if err != nil {
 		return nil, fmt.Errorf("generate for channel %s: %w", conv.ID, err)
 	}

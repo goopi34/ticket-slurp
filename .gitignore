@@ -30,6 +30,7 @@ Thumbs.db
 
 # Config (may contain secrets)
 config.yaml
+ticket-slurp.yaml
 
 # Docker
 docker/**/.env

@@ -51,12 +51,13 @@ type ChannelsConfig struct {
 
 // LLMConfig holds settings for the gollm AI analysis provider.
 type LLMConfig struct {
-	Provider  string          `mapstructure:"provider"` // azure | openai | anthropic | ollama
-	Model     string          `mapstructure:"model"`
-	Azure     AzureConfig     `mapstructure:"azure"`
-	OpenAI    OpenAIConfig    `mapstructure:"openai"`
-	Anthropic AnthropicConfig `mapstructure:"anthropic"`
-	Ollama    OllamaConfig    `mapstructure:"ollama"`
+	Provider     string          `mapstructure:"provider"`      // azure | openai | anthropic | ollama
+	Model        string          `mapstructure:"model"`
+	SystemPrompt string          `mapstructure:"system_prompt"` // overrides the built-in analysis prompt
+	Azure        AzureConfig     `mapstructure:"azure"`
+	OpenAI       OpenAIConfig    `mapstructure:"openai"`
+	Anthropic    AnthropicConfig `mapstructure:"anthropic"`
+	Ollama       OllamaConfig    `mapstructure:"ollama"`
 }
 
 // AzureConfig holds Azure AI Foundry specific settings.
@@ -83,8 +84,8 @@ type OllamaConfig struct {
 
 // AtlassianConfig holds Jira MCP server settings.
 type AtlassianConfig struct {
-	MCPURL     string `mapstructure:"mcp_url"`
-	ProjectKey string `mapstructure:"project_key"`
+	MCPURL      string   `mapstructure:"mcp_url"`
+	ProjectKeys []string `mapstructure:"project_keys"`
 }
 
 // OutputConfig controls report format.
@@ -156,8 +157,8 @@ func (c *Config) Validate() error {
 	if err := c.validateOutput(); err != nil {
 		return err
 	}
-	if c.Atlassian.ProjectKey == "" {
-		return fmt.Errorf("atlassian.project_key is required")
+	if len(c.Atlassian.ProjectKeys) == 0 {
+		return fmt.Errorf("atlassian.project_keys must contain at least one project key")
 	}
 	return nil
 }
