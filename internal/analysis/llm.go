@@ -11,7 +11,6 @@ import (
 )
 
 // LLMGenerator is the interface for generating text from a prompt.
-// It wraps gollm.LLM for testability.
 type LLMGenerator interface {
 	Generate(ctx context.Context, prompt string, systemPrompt string) (string, error)
 }
@@ -21,8 +20,15 @@ type GollmGenerator struct {
 	llm gollm.LLM
 }
 
-// NewGollmGenerator creates a GollmGenerator from the given config.
-func NewGollmGenerator(cfg config.LLMConfig) (*GollmGenerator, error) {
+// NewGollmGenerator creates an LLMGenerator from the given config.
+// For Azure, it returns an AzureGenerator that calls the API directly,
+// working around a bug in gollm where the azure_endpoint extra header is
+// not propagated to the internal HTTP client.
+func NewGollmGenerator(cfg config.LLMConfig) (LLMGenerator, error) {
+	if strings.ToLower(cfg.Provider) == "azure" {
+		return NewAzureGenerator(cfg.Azure.Endpoint, cfg.Azure.APIKey), nil
+	}
+
 	opts, err := buildGollmOptions(cfg)
 	if err != nil {
 		return nil, err
@@ -50,18 +56,10 @@ func (g *GollmGenerator) Generate(ctx context.Context, prompt, systemPrompt stri
 }
 
 // buildGollmOptions converts our config into gollm ConfigOptions.
+// Azure is handled separately via AzureGenerator and is never passed here.
 func buildGollmOptions(cfg config.LLMConfig) ([]gollm.ConfigOption, error) {
 	provider := strings.ToLower(cfg.Provider)
 	switch provider {
-	case "azure":
-		return []gollm.ConfigOption{
-			gollm.SetProvider("azure-openai"),
-			gollm.SetModel(cfg.Azure.Deployment),
-			gollm.SetAPIKey(cfg.Azure.APIKey),
-			gollm.SetExtraHeaders(map[string]string{
-				"azure_endpoint": cfg.Azure.Endpoint,
-			}),
-		}, nil
 	case "openai":
 		opts := []gollm.ConfigOption{
 			gollm.SetProvider("openai"),

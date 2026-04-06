@@ -14,21 +14,26 @@ func TestBuildGollmOptions_UnsupportedProvider(t *testing.T) {
 	}
 }
 
-func TestBuildGollmOptions_Azure(t *testing.T) {
+func TestNewGollmGenerator_Azure(t *testing.T) {
+	// Azure is handled by AzureGenerator, not gollm — verify NewGollmGenerator
+	// returns without error and produces a non-nil generator.
 	cfg := config.LLMConfig{
 		Provider: "azure",
 		Azure: config.AzureConfig{
-			Endpoint:   "https://example.azure.com",
+			Endpoint:   "https://example.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-01",
 			APIKey:     "key",
 			Deployment: "gpt-4o",
 		},
 	}
-	opts, err := buildGollmOptions(cfg)
+	gen, err := NewGollmGenerator(cfg)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if len(opts) == 0 {
-		t.Error("expected non-empty options for azure provider")
+	if gen == nil {
+		t.Error("expected non-nil generator for azure provider")
+	}
+	if _, ok := gen.(*AzureGenerator); !ok {
+		t.Errorf("expected *AzureGenerator, got %T", gen)
 	}
 }
 
