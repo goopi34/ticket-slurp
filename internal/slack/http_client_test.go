@@ -176,6 +176,75 @@ func TestListConversations_AuthHeaders(t *testing.T) {
 	}
 }
 
+func TestListConversations_BrowserHeaders_Defaults(t *testing.T) {
+	var got http.Header
+	srv := httptest.NewServer(handler(func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Clone()
+		writeJSON(t, w, map[string]interface{}{
+			"ok": true, "channels": []interface{}{},
+			"response_metadata": map[string]string{"next_cursor": ""},
+		})
+	}))
+	defer srv.Close()
+
+	client := newClient(t, srv.URL, nil, nil)
+	if _, err := client.ListConversations(context.Background()); err != nil {
+		t.Fatalf("ListConversations: %v", err)
+	}
+	if ua := got.Get("User-Agent"); ua == "" || ua == "Go-http-client/1.1" {
+		t.Errorf("expected a browser-like default User-Agent, got %q", ua)
+	}
+	for _, h := range []string{"Accept", "Accept-Language", "Origin", "Referer", "sec-ch-ua", "sec-ch-ua-mobile", "sec-ch-ua-platform"} {
+		if got.Get(h) == "" {
+			t.Errorf("expected default %s header to be set", h)
+		}
+	}
+}
+
+func TestListConversations_BrowserHeaders_Override(t *testing.T) {
+	var got http.Header
+	srv := httptest.NewServer(handler(func(w http.ResponseWriter, r *http.Request) {
+		got = r.Header.Clone()
+		writeJSON(t, w, map[string]interface{}{
+			"ok": true, "channels": []interface{}{},
+			"response_metadata": map[string]string{"next_cursor": ""},
+		})
+	}))
+	defer srv.Close()
+
+	client := newClient(t, srv.URL, nil, nil).WithBrowserHeaders(slack.BrowserHeaders{
+		UserAgent:       "Mozilla/5.0 (Macintosh) Custom/1.0",
+		Accept:          "application/json, text/plain, */*",
+		AcceptLanguage:  "fr-FR,fr;q=0.9",
+		Origin:          "https://example.slack.com",
+		Referer:         "https://example.slack.com/client",
+		SecChUA:         `"TestBrowser";v="1"`,
+		SecChUAMobile:   "?1",
+		SecChUAPlatform: `"macOS"`,
+		ExtraCookies:    "d-s=1234; lc=abcd",
+	})
+	if _, err := client.ListConversations(context.Background()); err != nil {
+		t.Fatalf("ListConversations: %v", err)
+	}
+
+	checks := map[string]string{
+		"User-Agent":         "Mozilla/5.0 (Macintosh) Custom/1.0",
+		"Accept":             "application/json, text/plain, */*",
+		"Accept-Language":    "fr-FR,fr;q=0.9",
+		"Origin":             "https://example.slack.com",
+		"Referer":            "https://example.slack.com/client",
+		"sec-ch-ua":          `"TestBrowser";v="1"`,
+		"sec-ch-ua-mobile":   "?1",
+		"sec-ch-ua-platform": `"macOS"`,
+		"Cookie":             "d=xoxd-test; d-s=1234; lc=abcd",
+	}
+	for h, want := range checks {
+		if g := got.Get(h); g != want {
+			t.Errorf("%s header: got %q, want %q", h, g, want)
+		}
+	}
+}
+
 // --- FetchMessages tests ---
 
 func TestFetchMessages_Basic(t *testing.T) {

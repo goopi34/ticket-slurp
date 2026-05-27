@@ -91,7 +91,17 @@ func runPipeline(cmd *cobra.Command, _ []string) error {
 		cfg.Channels.Whitelist,
 		cfg.Channels.Blacklist,
 		nil,
-	)
+	).WithBrowserHeaders(slack.BrowserHeaders{
+		UserAgent:       cfg.Slack.Browser.UserAgent,
+		Accept:          cfg.Slack.Browser.Accept,
+		AcceptLanguage:  cfg.Slack.Browser.AcceptLanguage,
+		Origin:          cfg.Slack.Browser.Origin,
+		Referer:         cfg.Slack.Browser.Referer,
+		SecChUA:         cfg.Slack.Browser.SecChUA,
+		SecChUAMobile:   cfg.Slack.Browser.SecChUAMobile,
+		SecChUAPlatform: cfg.Slack.Browser.SecChUAPlatform,
+		ExtraCookies:    cfg.Slack.Browser.ExtraCookies,
+	})
 
 	// Build LLM generator and analyzer.
 	gen, err := analysis.NewGollmGenerator(cfg.LLM)

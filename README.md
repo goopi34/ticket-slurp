@@ -94,9 +94,22 @@ output:
 
 API keys can be supplied inline or via environment variables using `${ENV_VAR}` syntax.
 
-#### Getting Slack tokens
+#### Getting Slack tokens (and matching your browser session)
 
-The `xoxc` and `xoxd` tokens come from the Slack desktop app's local storage or network requests. They are not available from the Slack API settings page.
+The `xoxc` and `xoxd` tokens come from your Slack session's network requests — they aren't available from the Slack API settings page. The cleanest workflow grabs both the tokens **and** the browser headers in one pass, so requests from ticket-slurp look identical to your live browser session:
+
+1. Open Slack in a Chromium-based browser and sign in to your workspace.
+2. Open devtools (F12) → **Network** tab → filter for `api`.
+3. Click around in Slack until you see requests to `slack.com/api/...` — pick any one.
+4. Right-click the request → **Copy** → **Copy as cURL**.
+5. From the copied command, fill in `ticket-slurp.yaml`:
+   - `slack.xoxc`: the `xoxc-...` token after `Authorization: Bearer`
+   - `slack.xoxd`: the `xoxd-...` value of the `d` cookie inside `Cookie: d=...`
+   - `slack.browser.user_agent`: the full `User-Agent` header value
+   - `slack.browser.accept_language`, `origin`, `referer`, `sec_ch_ua`, `sec_ch_ua_mobile`, `sec_ch_ua_platform`: the matching headers, verbatim
+   - `slack.browser.extra_cookies`: the rest of the `Cookie:` value with `d=...` removed (e.g. `d-s=...; lc=...; b=...`)
+
+Every `slack.browser.*` field is optional and falls back to a generic Chrome-on-Linux default; the more you fill in, the more closely the requests match your real browser.
 
 #### Getting a Jira PAT (Server/Data Center)
 
@@ -180,6 +193,7 @@ make install-tools  # install golangci-lint and goreleaser
 | `slack.xoxc` | yes | Slack desktop client token |
 | `slack.xoxd` | yes | Slack desktop client token |
 | `slack.user_id` | no | Filter messages to a specific Slack user ID |
+| `slack.browser.*` | no | Browser-identifying headers (`user_agent`, `accept`, `accept_language`, `origin`, `referer`, `sec_ch_ua`, `sec_ch_ua_mobile`, `sec_ch_ua_platform`, `extra_cookies`). Each field is optional with a Chrome-on-Linux default; copy from your browser's devtools to match your session. |
 | `timeframe.start` / `timeframe.end` | yes* | Explicit date range (YYYY-MM-DD, inclusive) |
 | `timeframe.last_days` | yes* | Relative window; mutually exclusive with start/end |
 | `channels.whitelist` | no | If non-empty, only these channel IDs are analysed |

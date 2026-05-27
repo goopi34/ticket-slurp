@@ -30,9 +30,25 @@ type Config struct {
 
 // SlackConfig holds Slack authentication credentials.
 type SlackConfig struct {
-	XOXC   string `mapstructure:"xoxc"`
-	XOXD   string `mapstructure:"xoxd"`
-	UserID string `mapstructure:"user_id"`
+	XOXC    string        `mapstructure:"xoxc"`
+	XOXD    string        `mapstructure:"xoxd"`
+	UserID  string        `mapstructure:"user_id"`
+	Browser BrowserConfig `mapstructure:"browser"`
+}
+
+// BrowserConfig holds HTTP headers used to make Slack API requests look like
+// they originate from the browser session the xoxc/xoxd tokens were copied
+// from. All fields are optional; empty values fall back to sensible defaults.
+type BrowserConfig struct {
+	UserAgent       string `mapstructure:"user_agent"`
+	Accept          string `mapstructure:"accept"`
+	AcceptLanguage  string `mapstructure:"accept_language"`
+	Origin          string `mapstructure:"origin"`
+	Referer         string `mapstructure:"referer"`
+	SecChUA         string `mapstructure:"sec_ch_ua"`
+	SecChUAMobile   string `mapstructure:"sec_ch_ua_mobile"`
+	SecChUAPlatform string `mapstructure:"sec_ch_ua_platform"`
+	ExtraCookies    string `mapstructure:"extra_cookies"`
 }
 
 // TimeframeConfig specifies the message date range.

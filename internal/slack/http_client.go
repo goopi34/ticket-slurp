@@ -15,6 +15,70 @@ const (
 	conversationTypes = "public_channel,private_channel,mpim,im"
 )
 
+// BrowserHeaders configures the HTTP headers used to mimic a real browser
+// session. Empty fields fall back to defaults that resemble a recent Chrome
+// on Linux. For best results, copy the values from the same browser session
+// the xoxc/xoxd tokens were extracted from (devtools → Network → "Copy as
+// cURL" on any slack.com/api request).
+type BrowserHeaders struct {
+	UserAgent       string
+	Accept          string
+	AcceptLanguage  string
+	Origin          string
+	Referer         string
+	SecChUA         string
+	SecChUAMobile   string
+	SecChUAPlatform string
+	// ExtraCookies is appended to the Cookie header after the required
+	// "d=<xoxd>" cookie, separated by "; ". Useful for forwarding additional
+	// session cookies (d-s, lc, b, x, etc.) so the request matches the
+	// browser's full Cookie header.
+	ExtraCookies string
+}
+
+// Default values for BrowserHeaders. Chosen to look like a current Chrome on
+// Linux; users should override these to match their actual browser.
+const (
+	defaultUserAgent       = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36"
+	defaultAccept          = "*/*"
+	defaultAcceptLanguage  = "en-US,en;q=0.9"
+	defaultOrigin          = "https://app.slack.com"
+	defaultReferer         = "https://app.slack.com/"
+	defaultSecChUA         = `"Chromium";v="145", "Not_A Brand";v="24", "Google Chrome";v="145"`
+	defaultSecChUAMobile   = "?0"
+	defaultSecChUAPlatform = `"Linux"`
+)
+
+// withDefaults returns a copy of b with any empty fields replaced by the
+// package defaults.
+func (b BrowserHeaders) withDefaults() BrowserHeaders {
+	if b.UserAgent == "" {
+		b.UserAgent = defaultUserAgent
+	}
+	if b.Accept == "" {
+		b.Accept = defaultAccept
+	}
+	if b.AcceptLanguage == "" {
+		b.AcceptLanguage = defaultAcceptLanguage
+	}
+	if b.Origin == "" {
+		b.Origin = defaultOrigin
+	}
+	if b.Referer == "" {
+		b.Referer = defaultReferer
+	}
+	if b.SecChUA == "" {
+		b.SecChUA = defaultSecChUA
+	}
+	if b.SecChUAMobile == "" {
+		b.SecChUAMobile = defaultSecChUAMobile
+	}
+	if b.SecChUAPlatform == "" {
+		b.SecChUAPlatform = defaultSecChUAPlatform
+	}
+	return b
+}
+
 // HTTPClient implements Client using Slack's HTTP API with xoxc/xoxd credentials.
 type HTTPClient struct {
 	baseURL   string
@@ -22,6 +86,7 @@ type HTTPClient struct {
 	xoxd      string
 	whitelist map[string]bool
 	blacklist map[string]bool
+	browser   BrowserHeaders
 	http      *http.Client
 }
 
@@ -40,6 +105,7 @@ func NewHTTPClient(xoxc, xoxd string, whitelist, blacklist []string, httpClient 
 		xoxd:      xoxd,
 		whitelist: wl,
 		blacklist: bl,
+		browser:   BrowserHeaders{}.withDefaults(),
 		http:      httpClient,
 	}
 }
@@ -47,6 +113,40 @@ func NewHTTPClient(xoxc, xoxd string, whitelist, blacklist []string, httpClient 
 // WithBaseURL overrides the API base URL (used in tests).
 func (c *HTTPClient) WithBaseURL(u string) *HTTPClient {
 	c.baseURL = u
+	return c
+}
+
+// WithBrowserHeaders overrides the browser-identifying headers. Empty fields
+// in b retain their existing values, so callers can override only what they
+// care about.
+func (c *HTTPClient) WithBrowserHeaders(b BrowserHeaders) *HTTPClient {
+	if b.UserAgent != "" {
+		c.browser.UserAgent = b.UserAgent
+	}
+	if b.Accept != "" {
+		c.browser.Accept = b.Accept
+	}
+	if b.AcceptLanguage != "" {
+		c.browser.AcceptLanguage = b.AcceptLanguage
+	}
+	if b.Origin != "" {
+		c.browser.Origin = b.Origin
+	}
+	if b.Referer != "" {
+		c.browser.Referer = b.Referer
+	}
+	if b.SecChUA != "" {
+		c.browser.SecChUA = b.SecChUA
+	}
+	if b.SecChUAMobile != "" {
+		c.browser.SecChUAMobile = b.SecChUAMobile
+	}
+	if b.SecChUAPlatform != "" {
+		c.browser.SecChUAPlatform = b.SecChUAPlatform
+	}
+	if b.ExtraCookies != "" {
+		c.browser.ExtraCookies = b.ExtraCookies
+	}
 	return c
 }
 
@@ -157,8 +257,24 @@ func (c *HTTPClient) get(ctx context.Context, method string, params url.Values, 
 	}
 
 	req.Header.Set("Authorization", "Bearer "+c.xoxc)
-	req.Header.Set("Cookie", "d="+c.xoxd)
-	req.Header.Set("Accept", "application/json")
+	cookie := "d=" + c.xoxd
+	if c.browser.ExtraCookies != "" {
+		cookie += "; " + c.browser.ExtraCookies
+	}
+	req.Header.Set("Cookie", cookie)
+	req.Header.Set("Accept", c.browser.Accept)
+	req.Header.Set("Accept-Language", c.browser.AcceptLanguage)
+	req.Header.Set("User-Agent", c.browser.UserAgent)
+	req.Header.Set("Origin", c.browser.Origin)
+	req.Header.Set("Referer", c.browser.Referer)
+	req.Header.Set("sec-ch-ua", c.browser.SecChUA)
+	req.Header.Set("sec-ch-ua-mobile", c.browser.SecChUAMobile)
+	req.Header.Set("sec-ch-ua-platform", c.browser.SecChUAPlatform)
+	// Browser-driven fetch metadata — invariant for XHR calls from the Slack
+	// web app, so they're hardcoded rather than parameterized.
+	req.Header.Set("Sec-Fetch-Dest", "empty")
+	req.Header.Set("Sec-Fetch-Mode", "cors")
+	req.Header.Set("Sec-Fetch-Site", "same-site")
 
 	resp, err := c.http.Do(req)
 	if err != nil {

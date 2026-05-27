@@ -9,6 +9,24 @@ slack:
   # Optional: filter to a specific Slack user ID (leave empty to use the authenticated user)
   user_id: ""
 
+  # Browser-identifying headers. To blend in, open devtools on the same
+  # browser session you copied xoxc/xoxd from, find any slack.com/api/*
+  # request, and paste the headers from "Copy as cURL" below. Any field left
+  # empty falls back to a generic Chrome-on-Linux default.
+  browser:
+    user_agent: ""        # e.g. "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ..."
+    accept: ""            # e.g. "*/*"
+    accept_language: ""   # e.g. "en-US,en;q=0.9"
+    origin: ""            # e.g. "https://app.slack.com"
+    referer: ""           # e.g. "https://app.slack.com/"
+    sec_ch_ua: ""         # e.g. '"Chromium";v="145", "Not_A Brand";v="24"'
+    sec_ch_ua_mobile: ""  # e.g. "?0"
+    sec_ch_ua_platform: "" # e.g. '"macOS"'
+    # Additional cookies from your browser session beyond the required "d"
+    # cookie (which is set automatically from xoxd above). Paste the rest of
+    # your Cookie header here, e.g. "d-s=...; lc=...; b=...".
+    extra_cookies: ""
+
 timeframe:
   # Option A: explicit date range (YYYY-MM-DD, inclusive)
   start: "2026-03-27"
